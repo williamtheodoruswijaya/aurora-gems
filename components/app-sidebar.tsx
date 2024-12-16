@@ -75,8 +75,8 @@ export function AppSidebar() {
                   <div
                     className={`flex items-center px-4 py-2 rounded-md transition-colors duration-200 ${
                       isActive(item.url)
-                        ? "bg-purple-500 text-white"
-                        : "bg-transparent text-gray-700 hover:bg-gray-200"
+                        ? "dark:bg-blue-800 bg-purple-500 text-white"
+                        : "bg-transparent hover:bg-gray-200 hover:dark:bg-slate-900"
                     }`}
                   >
                     <item.icon className="mr-3" />
