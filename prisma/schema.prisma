@@ -13,11 +13,56 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  BUYER
+  SELLER
+}
+
 model User {
-  id      Int      @id @default(autoincrement())
-  email   String   @unique
-  username String @unique
-  password String
-  createdAt DateTime @default(now())
-  updated DateTime @updatedAt
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  username      String    @unique
+  password      String
+  role          Role      @default(BUYER)
+  createdAt     DateTime  @default(now())
+  updated       DateTime  @updatedAt
+
+  // One-to many relationship
+  diamonds      Diamond[]
+  transactions  Transaction[]
+  wishlist      Wishlist[]
+}
+
+model Diamond {
+  id          Int       @id @default(autoincrement())
+  name        String    
+  type        String    
+  weight      Float     
+  price       Float     
+  listedById  Int       
+  listedBy    User      @relation(fields: [listedById], references: [id])
+  createdAt   DateTime  @default(now())
+
+  // One-to many Relationships
+  transactions Transaction[]
+  wishlists    Wishlist[]
+}
+
+model Transaction {
+  id           Int        @id @default(autoincrement())
+  buyerId      Int        
+  buyer        User       @relation(fields: [buyerId], references: [id])
+  diamondId    Int        
+  diamond      Diamond    @relation(fields: [diamondId], references: [id])
+  price        Float     
+  transactionAt DateTime  @default(now())
+}
+
+model Wishlist {
+  id         Int       @id @default(autoincrement())
+  userId     Int       
+  user       User      @relation(fields: [userId], references: [id])
+  diamondId  Int       
+  diamond    Diamond   @relation(fields: [diamondId], references: [id])
+  createdAt  DateTime  @default(now())
 }
