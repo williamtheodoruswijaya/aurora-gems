@@ -28,7 +28,7 @@ const items = [
   {
     title: "Dashboard",
     icon: Home,
-    url: "/",
+    url: "/home",
   },
   {
     title: "Price Prediction",
