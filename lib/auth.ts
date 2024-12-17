@@ -52,4 +52,22 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        // Assign custom properties to the JWT
+        token.id = user.id;
+        token.username = user.username;
+        token.email = user.email;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // Include custom properties in the session
+      session.user.id = token.id;
+      session.user.username = token.username;
+      session.user.email = token.email;
+      return session;
+    },
+  },
 };
