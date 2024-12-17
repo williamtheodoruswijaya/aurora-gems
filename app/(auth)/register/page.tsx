@@ -2,13 +2,32 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Login from "../login/page";
+import * as z from "zod";
+import axios from "axios";
+
+const userSchema = z
+  .object({
+    username: z.string().min(1, "Username is required").max(100),
+    email: z.string().min(1, "Email is required").max(100),
+    password: z
+      .string()
+      .min(1, "Password is required")
+      .min(8, "Password must have than 8 characters")
+      .max(100),
+    role: z.enum(["BUYER", "SELLER"]),
+    confirmPassword: z.string().min(1, "Confirm Password is required").max(100),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match",
+  });
 
 export default function Register() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [selectedRole, setSelectedRole] = useState("BUYER");
+  const [selectedRole, setSelectedRole] = useState<"BUYER" | "SELLER">("BUYER");
   const [animateOut, setAnimateOut] = useState(false);
   const [isActive, setIsActive] = useState({
     login: false,
@@ -24,9 +43,48 @@ export default function Register() {
     }, 1600);
   };
 
-  const handleRegister = () => {
-    console.log("register");
+  const handleRegister = async (values: z.infer<typeof userSchema>) => {
+    try {
+      const parsedData = userSchema.parse({
+        username: values.username,
+        email: values.email,
+        password: values.password,
+        role: values.role,
+        confirmPassword: values.confirmPassword,
+      });
+
+      const response = await axios.post("/api/user", {
+        username: parsedData.username,
+        email: parsedData.email,
+        password: parsedData.password,
+        role: parsedData.role,
+      });
+
+      if (response.status === 201) {
+        alert("User created successfully");
+        setAnimateOut(true);
+        setTimeout(() => {
+          setIsActive({ login: true, register: false });
+          setAnimateOut(false);
+        }, 1600);
+      } else if (response.status === 409) {
+        alert("Email or Username already exists");
+      } else if (response.status === 500) {
+        alert("Something went wrong");
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 409) {
+          alert("Email or Username already exists");
+        } else if (error.response?.status === 500) {
+          alert("Something went wrong");
+        }
+      } else {
+        alert("An unexpected error occurred");
+      }
+    }
   };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 100 }}
@@ -122,7 +180,15 @@ export default function Register() {
                 </button>
               </div>
               <button
-                onClick={handleRegister}
+                onClick={() =>
+                  handleRegister({
+                    username,
+                    email,
+                    password,
+                    confirmPassword,
+                    role: selectedRole,
+                  })
+                }
                 type="button"
                 className=" rounded-xl bg-slate-800 text-white font-semibold min-w-[20rem] w-full p-2 hover:text-slate-50 items-center justify-center"
               >
