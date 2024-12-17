@@ -1,7 +1,18 @@
+"use client";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import Register from "../register/page";
+import * as z from "zod";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+
+const loginSchema = z.object({
+  email: z.string().min(1, "Email is required").max(100),
+  password: z.string().min(1, "Password is required"),
+});
+
 export default function Login() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [animateOut, setAnimateOut] = useState(false);
@@ -19,9 +30,21 @@ export default function Login() {
     }, 1600);
   };
 
-  const signIn = () => {
-    console.log("sign in");
+  const onSubmit = async (values: z.infer<typeof loginSchema>) => {
+    const signInData = await signIn("credentials", {
+      email: values.email,
+      password: values.password,
+      redirect: false,
+    });
+
+    if (signInData?.error) {
+      console.log(signInData.error);
+      alert("Invalid credentials");
+    } else {
+      router.push("/home");
+    }
   };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 100 }}
@@ -72,7 +95,14 @@ export default function Login() {
                 </button>
               </div>
               <button
-                onClick={signIn}
+                onClick={() => {
+                  const result = loginSchema.safeParse({ email, password });
+                  if (result.success) {
+                    onSubmit(result.data);
+                  } else {
+                    alert(result.error.errors.map((e) => e.message).join(", "));
+                  }
+                }}
                 type="button"
                 className=" rounded-xl bg-slate-800 text-white font-semibold min-w-[20rem] w-full p-2  hover:text-slate-50 items-center justify-center"
               >
