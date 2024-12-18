@@ -1,4 +1,4 @@
-import { NextAuthOptions } from "next-auth";
+import { NextAuthOptions, User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import prisma from "./prisma";
@@ -31,6 +31,13 @@ export const authOptions: NextAuthOptions = {
         // Check if user exists in the database
         const existingUser = await prisma.user.findUnique({
           where: { email: credentials?.email },
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            password: true,
+            role: true,
+          },
         });
         // If no user exists, return null
         if (!existingUser) {
@@ -48,7 +55,8 @@ export const authOptions: NextAuthOptions = {
           id: `${existingUser.id}`, // biar ga dapet warning
           username: existingUser.username,
           email: existingUser.email,
-        };
+          role: existingUser.role,
+        } as User;
       },
     }),
   ],
@@ -59,6 +67,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.username = user.username;
         token.email = user.email;
+        token.role = user.role;
       }
       return token;
     },
@@ -67,6 +76,7 @@ export const authOptions: NextAuthOptions = {
       session.user.id = token.id;
       session.user.username = token.username;
       session.user.email = token.email;
+      session.user.role = token.role;
       return session;
     },
   },
