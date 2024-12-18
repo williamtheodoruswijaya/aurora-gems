@@ -68,7 +68,21 @@ export async function POST(
         type: "TRANSACTION",
       },
     });
+    await prisma.transaction.create({
+      data: {
+        buyerId: userId,
+        diamondId: id,
+        price: diamond.price,
+      },
+    });
 
+    // step 6: change diamond's listedbyId to buyer's id
+    await prisma.diamond.update({
+      where: { id: id },
+      data: { listedById: userId },
+    });
+
+    // step 7: return diamond
     return NextResponse.json(
       { diamond: diamond, message: "Diamond purchased successfully" },
       { status: 200 }
