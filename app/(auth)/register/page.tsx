@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Login from "../login/page";
 import * as z from "zod";
 import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 
 const userSchema = z
   .object({
@@ -23,6 +24,7 @@ const userSchema = z
   });
 
 export default function Register() {
+  const { toast } = useToast();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -61,26 +63,36 @@ export default function Register() {
       });
 
       if (response.status === 201) {
-        alert("User created successfully");
+        toast({ title: "Account created successfully" });
         setAnimateOut(true);
         setTimeout(() => {
           setIsActive({ login: true, register: false });
           setAnimateOut(false);
         }, 1600);
       } else if (response.status === 409) {
-        alert("Email or Username already exists");
+        toast({
+          title: "Email or Username already exists",
+          variant: "destructive",
+        });
       } else if (response.status === 500) {
-        alert("Something went wrong");
+        toast({ title: "Something went wrong", variant: "destructive" });
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (error.response?.status === 409) {
-          alert("Email or Username already exists");
-        } else if (error.response?.status === 500) {
-          alert("Something went wrong");
+      if (axios.isAxiosError(error) && error.response) {
+        const status = error.response.status;
+        if (status === 409) {
+          toast({
+            title: "Email or Username already exists",
+            variant: "destructive",
+          });
+        } else if (status === 500) {
+          toast({ title: "Something went wrong", variant: "destructive" });
         }
       } else {
-        alert("An unexpected error occurred");
+        toast({
+          title: "Unexpected error has occured!",
+          variant: "destructive",
+        });
       }
     }
   };

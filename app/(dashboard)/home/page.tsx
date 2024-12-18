@@ -1,17 +1,21 @@
-import { authOptions } from "@/lib/auth";
-import { getServerSession } from "next-auth";
+"use client";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-const Home = async () => {
-  const session = await getServerSession(authOptions);
+export default function Home() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
 
-  console.log(session); // This will log the session on the server
-
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/");
+    }
+  }, [status]);
   return (
-    <div>
-      <h1>Home</h1>
+    <div className="ml-72 mt-20">
       <pre>{JSON.stringify(session, null, 2)}</pre>
+      <pre>{JSON.stringify(status)}</pre>
     </div>
   );
-};
-
-export default Home;
+}

@@ -26,7 +26,7 @@ export default function Page() {
         backgroundColor="black"
         baseHue={255}
         particleCount={500}
-        className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-full"
+        className="flex items-center flex-col justify-center px-2 md:px-10 py-4 w-full h-full z-10"
       >
         {isActive.first && (
           <motion.div>
