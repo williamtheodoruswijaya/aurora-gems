@@ -9,14 +9,20 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
 enum Role {
   BUYER
   SELLER
+}
+
+enum BalanceType {
+  DEPOSIT
+  WITHDRAW
+  TRANSACTION
 }
 
 model User {
@@ -32,6 +38,7 @@ model User {
   diamonds      Diamond[]
   transactions  Transaction[]
   wishlist      Wishlist[]
+  balances      Balance[]
 }
 
 model Diamond {
@@ -66,4 +73,22 @@ model Wishlist {
   diamondId  Int       
   diamond    Diamond   @relation(fields: [diamondId], references: [id])
   createdAt  DateTime  @default(now())
+}
+
+model Balance {
+  id        Int       @id @default(autoincrement())
+  userId    Int       
+  user      User      @relation(fields: [userId], references: [id])
+  balance   Float     
+  createdAt DateTime  @default(now())
+  history   BalanceHistory[]
+}
+
+model BalanceHistory {
+  id          Int       @id @default(autoincrement())
+  balanceId   Int       
+  balance     Balance   @relation(fields: [balanceId], references: [id])
+  amount      Float     
+  type        BalanceType 
+  createdAt   DateTime  @default(now())
 }
