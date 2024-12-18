@@ -61,10 +61,10 @@ export default function Home() {
 
       {/* Modal for Viewing Details */}
       {showModal && selectedDiamond && (
-        <Modal onClose={handleCloseModal}>
-          <h2 className="text-2xl font-bold mb-4">{selectedDiamond.name}</h2>
-          <p className="text-lg">{selectedDiamond.description}</p>
-          <p className="text-lg font-semibold mt-2">{selectedDiamond.price}</p>
+        <Modal  onClose={handleCloseModal}>
+          <h2 className="text-black text-2xl font-bold mb-4">{selectedDiamond.name}</h2>
+          <p className="text-black text-lg">{selectedDiamond.description}</p>
+          <p className="text-black text-lg mt-2">{selectedDiamond.price}</p>
           <div className="flex space-x-4 mt-6">
             <button
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
