@@ -5,6 +5,7 @@ import Register from "../register/page";
 import * as z from "zod";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").max(100),
@@ -12,6 +13,7 @@ const loginSchema = z.object({
 });
 
 export default function Login() {
+  const { toast } = useToast();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,7 +41,11 @@ export default function Login() {
 
     if (signInData?.error) {
       console.log(signInData.error);
-      alert("Invalid credentials");
+      toast({
+        title: "Error",
+        description: signInData.error,
+        variant: "destructive",
+      });
     } else {
       router.push("/home");
     }
