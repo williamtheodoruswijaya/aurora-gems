@@ -19,7 +19,6 @@ import {
   History,
   Home,
   SaveIcon,
-  ShoppingCart,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -34,11 +33,6 @@ const items = [
     title: "Price Prediction",
     icon: ChartBarIcon,
     url: "/price-prediction",
-  },
-  {
-    title: "Marketplace",
-    icon: ShoppingCart,
-    url: "/marketplace",
   },
   {
     title: "Wishlist",
