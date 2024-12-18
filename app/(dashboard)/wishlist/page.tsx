@@ -52,9 +52,9 @@ export default function Wishlist() {
       {/* Modal */}
       {showModal && selectedItem && (
         <Modal onClose={handleCloseModal}>
-          <h2 className="text-2xl font-bold mb-4">{selectedItem.name}</h2>
-          <p className="text-lg">{selectedItem.description}</p>
-          <p className="text-lg font-semibold mt-2">{selectedItem.price}</p>
+          <h2 className="text-black text-2xl font-bold mb-4">{selectedItem.name}</h2>
+          <p className="text-black text-lg">{selectedItem.description}</p>
+          <p className="text-black text-lg font-semibold mt-2">{selectedItem.price}</p>
           <div className="flex space-x-4 mt-6">
             <button
               className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
