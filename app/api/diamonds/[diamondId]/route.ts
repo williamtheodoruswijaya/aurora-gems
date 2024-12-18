@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 // The handler for the GET request
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ diamondId: string }> } // Destructuring params from context
+  { params }: { params: Promise<{ diamondId: string }> }
 ) {
   try {
     const { diamondId } = await params;

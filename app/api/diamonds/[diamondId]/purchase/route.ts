@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: Promise<{ diamondId: string }> } // Destructuring params from context
+  { params }: { params: Promise<{ diamondId: string }> }
 ) {
   const { diamondId } = await params;
   const id = parseInt(diamondId, 10);

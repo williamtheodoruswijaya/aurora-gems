@@ -6,37 +6,49 @@ import { NextResponse } from "next/server";
 export const GET = async () => {
   const session = await getServerSession(authOptions);
 
-  // If the user is not authenticated, return a 401 status
+  // step 0: check if user is authenticated
   if (!session) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   const userId = parseInt(session.user.id, 10);
   try {
-    const wishlist = await prisma.wishlist.findMany({
+    const diamonds = await prisma.diamond.findMany({
       where: {
-        userId: userId,
+        listedById: userId,
       },
       select: {
         id: true,
-        userId: true,
-        diamondId: true,
+        name: true,
+        type: true,
+        weight: true,
+        price: true,
+        listedById: true,
+        listedBy: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            role: true,
+          },
+        },
         createdAt: true,
       },
     });
-    if (wishlist.length === 0) {
+
+    if (diamonds.length === 0) {
       return NextResponse.json(
-        { message: "No wishlist found" },
+        { messsage: "No diamonds found" },
         { status: 404 }
       );
     }
     return NextResponse.json(
-      { message: "Success", data: wishlist },
+      { message: "Success", data: diamonds },
       { status: 200 }
     );
   } catch (error) {
     return NextResponse.json(
-      { wishlist: null, message: "Internal server error", error },
+      { diamonds: null, message: "Internal server error", error },
       { status: 500 }
     );
   }
