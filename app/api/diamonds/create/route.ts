@@ -25,16 +25,6 @@ export const POST = async (req: NextRequest) => {
     const body = await req.json();
     const { name, type, weight, price, listedById } = diamondSchema.parse(body);
 
-    const newDiamond = await prisma.diamond.create({
-      data: {
-        name,
-        type,
-        weight,
-        price,
-        listedById,
-      },
-    });
-
     // Check if user that listed the diamond exists
     const userExists = await prisma.user.findUnique({
       where: { id: listedById },
@@ -45,6 +35,32 @@ export const POST = async (req: NextRequest) => {
         { status: 404 }
       );
     }
+
+    // Check if user already have balance
+    const userBalance = await prisma.balance.findFirst({
+      where: { userId: listedById },
+    });
+    // if user doesn't have balance, create one
+    if (!userBalance) {
+      await prisma.balance.create({
+        data: {
+          userId: listedById,
+          balance: 0,
+        },
+      });
+    }
+
+    // step 2: create the diamond
+    const newDiamond = await prisma.diamond.create({
+      data: {
+        name,
+        type,
+        weight,
+        price,
+        listedById,
+      },
+    });
+
     return NextResponse.json(
       {
         diamond: newDiamond,
