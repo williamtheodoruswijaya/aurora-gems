@@ -118,17 +118,21 @@ export default function Home() {
         <h1 className="text-3xl font-bold">Welcome to Aurora Gems</h1>
         <p className="mt-2">Discover our finest selection of diamonds.</p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-        {diamonds.map((diamond) => (
-          <Card
-            key={diamond.id}
-            name={diamond.name}
-            price={diamond.price.toLocaleString()}
-            description={diamond.type}
-            onClick={() => handleViewDetails(diamond)} // Pass diamond data to modal
-          />
-        ))}
-      </div>
+      {diamonds.length === 0 ? (
+        <p className="text-xl">No diamonds available</p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {diamonds.map((diamond) => (
+            <Card
+              key={diamond.id}
+              name={diamond.name}
+              price={diamond.price.toLocaleString()}
+              description={diamond.type}
+              onClick={() => handleViewDetails(diamond)} // Pass diamond data to modal
+            />
+          ))}
+        </div>
+      )}
 
       {showModal && selectedDiamond && (
         <Modal onClose={handleCloseModal}>

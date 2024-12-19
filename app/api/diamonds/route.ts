@@ -1,9 +1,18 @@
+import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 export const GET = async () => {
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  const userId = parseInt(session.user.id, 10);
   try {
     const diamonds = await prisma.diamond.findMany({
+      where: { listedById: { not: userId } },
       select: {
         id: true,
         name: true,

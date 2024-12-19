@@ -38,7 +38,7 @@ export async function POST(
       // step 2: get diamond price
       const diamond = await tx.diamond.findUnique({
         where: { id: id },
-        select: { price: true },
+        select: { price: true, listedById: true },
       });
       if (!diamond) {
         return NextResponse.json(
@@ -59,6 +59,24 @@ export async function POST(
       await tx.balance.update({
         where: { id: balance.id },
         data: { balance: { decrement: diamond.price } },
+      });
+
+      // step 5: add diamond price to seller balance
+      // - get seller balance
+      const sellerBalance = await tx.balance.findFirst({
+        where: { userId: diamond.listedById },
+        select: { balance: true, id: true },
+      });
+      if (!sellerBalance) {
+        return NextResponse.json(
+          { diamond: null, message: "Seller balance not found" },
+          { status: 404 }
+        );
+      }
+      // - add diamond price to seller balance
+      await tx.balance.update({
+        where: { id: sellerBalance.id },
+        data: { balance: { increment: diamond.price } },
       });
 
       // step 5: create purchase record
