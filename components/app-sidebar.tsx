@@ -19,6 +19,7 @@ import {
   History,
   Home,
   SaveIcon,
+  Gem,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -30,9 +31,9 @@ const items = [
     url: "/home",
   },
   {
-    title: "Price Prediction",
-    icon: ChartBarIcon,
-    url: "/price-prediction",
+    title: "My Diamonds",
+    icon: Gem,
+    url: "/my-diamond",
   },
   {
     title: "Wishlist",
