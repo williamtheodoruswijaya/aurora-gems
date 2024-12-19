@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, MouseEventHandler } from 'react';
+import { ReactNode, MouseEventHandler } from "react";
 
 interface ModalProps {
   children: ReactNode;
@@ -8,10 +8,16 @@ interface ModalProps {
 }
 
 export default function Modal({ children, onClose }: ModalProps) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md relative">
-          {/* Close Button */}
+  return (
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
+      <div className="relative bg-cover rounded-lg shadow-lg p-6 w-full max-w-md">
+        <div className="absolute inset-0 bg-black dark:bg-white rounded-lg z-0"></div>
+        <div
+          className="absolute inset-0 bg-[url('../public/assets/diamond.gif')] dark:bg-[url('../public/assets/diamond-background.jpeg')] bg-cover rounded-lg z-0"
+          style={{ filter: "blur(5px)" }}
+        ></div>
+
+        <div className="relative z-10">
           <button
             className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
             onClick={onClose}
@@ -21,6 +27,6 @@ export default function Modal({ children, onClose }: ModalProps) {
           {children}
         </div>
       </div>
-    );
-  }
-  
+    </div>
+  );
+}

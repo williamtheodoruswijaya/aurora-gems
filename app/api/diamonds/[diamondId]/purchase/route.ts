@@ -23,7 +23,7 @@ export async function POST(
   try {
     // step 1: get user balance
     const balance = await prisma.balance.findFirst({
-      where: { id: userId },
+      where: { userId: userId },
       select: { balance: true, id: true },
     });
 

@@ -1,28 +1,19 @@
 "use client";
-
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Card from "@/components/card";
 import Modal from "@/components/modal";
-
-const diamonds = [
-  { name: "Brilliant Cut Diamond", price: "$5,000", description: "0.5 carat, flawless clarity" },
-  { name: "Prince Cut Diamond", price: "$8,000", description: "0.75 carat, VVS2 clarity" },
-  { name: "Emerald Cut Diamond", price: "$12,000", description: "1 carat, color D" },
-  { name: "Oval Cut Diamond", price: "$15,000", description: "1.5 carat, VS1 clarity" },
-  { name: "Cushion Cut Diamond", price: "$20,000", description: "2 carat, brilliant shine" },
-  { name: "Brilliant Cut Diamond", price: "$5,000", description: "0.5 carat, flawless clarity" },
-  { name: "Prince Cut Diamond", price: "$8,000", description: "0.75 carat, VVS2 clarity" },
-  { name: "Emerald Cut Diamond", price: "$12,000", description: "1 carat, color D" },
-  { name: "Oval Cut Diamond", price: "$15,000", description: "1.5 carat, VS1 clarity" },
-  { name: "Cushion Cut Diamond", price: "$20,000", description: "2 carat, brilliant shine" },
-];
+import axios from "axios";
+import { Diamond } from "@/types/types";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Home() {
+  const { toast } = useToast();
   const { data: session, status } = useSession();
   const [isBuyer, setIsBuyer] = useState(true);
-  const [selectedDiamond, setSelectedDiamond] = useState<{ name: string; price: string; description: string } | null>(null); // Track selected diamond
-  const [showModal, setShowModal] = useState(false); // Manage modal visibility
+  const [diamonds, setDiamonds] = useState<Diamond[]>([]);
+  const [selectedDiamond, setSelectedDiamond] = useState<Diamond | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     if (status === "authenticated" && session?.user?.role === "SELLER") {
@@ -30,7 +21,22 @@ export default function Home() {
     }
   }, [status, session?.user?.role]);
 
-  const handleViewDetails = (diamond: { name: string; price: string; description: string }) => {
+  useEffect(() => {
+    const fetchDiamonds = async () => {
+      try {
+        const response = await axios.get("/api/diamonds");
+        setDiamonds(response.data.data);
+        if (response.status === 200) {
+          console.log("Diamonds fetched successfully");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchDiamonds();
+  }, []);
+
+  const handleViewDetails = (diamond: Diamond) => {
     setSelectedDiamond(diamond);
     setShowModal(true);
   };
@@ -38,6 +44,64 @@ export default function Home() {
   const handleCloseModal = () => {
     setSelectedDiamond(null);
     setShowModal(false);
+  };
+
+  const handleBuyNow = async (id: number) => {
+    try {
+      const response = await axios.post(`/api/diamonds/${id}/purchase`);
+      if (response.status === 200) {
+        toast({
+          title: "Diamond purchased successfully",
+          description: "Thank you for shopping with us!",
+          variant: "default",
+        });
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast({
+          title: "Error purchasing diamond",
+          description:
+            error.response?.data.message ||
+            "An error occurred. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error purchasing diamond",
+          description: "An error occurred. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const handleAddToWishlist = async (id: number) => {
+    try {
+      const response = await axios.post(`/api/diamonds/${id}/create-wishlist`);
+      if (response.status === 200) {
+        toast({
+          title: "Diamond added to wishlist",
+          description: "View your wishlist in your profile.",
+          variant: "default",
+        });
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast({
+          title: "Error adding diamond to wishlist",
+          description:
+            error.response?.data.message ||
+            "An error occurred. Please try again.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error adding diamond to wishlist",
+          description: "An error occurred. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
   };
 
   return (
@@ -48,35 +112,45 @@ export default function Home() {
         <p className="mt-2">Discover our finest selection of diamonds.</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-        {diamonds.map((diamond, index) => (
+        {diamonds.map((diamond) => (
           <Card
-            key={index}
+            key={diamond.id}
             name={diamond.name}
-            price={diamond.price}
-            description={diamond.description}
+            price={diamond.price.toLocaleString()}
+            description={diamond.type}
             onClick={() => handleViewDetails(diamond)} // Pass diamond data to modal
           />
         ))}
       </div>
 
-      {/* Modal for Viewing Details */}
       {showModal && selectedDiamond && (
-        <Modal  onClose={handleCloseModal}>
-          <h2 className="text-black text-2xl font-bold mb-4">{selectedDiamond.name}</h2>
-          <p className="text-black text-lg">{selectedDiamond.description}</p>
-          <p className="text-black text-lg mt-2">{selectedDiamond.price}</p>
-          <div className="flex space-x-4 mt-6">
+        <Modal onClose={handleCloseModal}>
+          <h2 className="dark:text-black text-white text-3xl font-bold mb-1">
+            {selectedDiamond.name}
+          </h2>
+          <p className="dark:text-black text-white text-base">
+            {selectedDiamond.type} - owned by{" "}
+            {selectedDiamond.listedBy.username}
+          </p>
+          <p className="dark:text-black text-white text-sm">
+            Weight: {selectedDiamond.weight} gram
+          </p>
+
+          <p className=" text-2xl mt-20 font-semibold text-purple-600">
+            ${selectedDiamond.price.toLocaleString()}
+          </p>
+          <div className="flex space-x-4">
             <button
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              onClick={() => alert("Added to wishlist!")}
+              className="px-4 py-2 bg-purple-500 text-white rounded hover:bg-purple-700 min-w-32"
+              onClick={() => handleBuyNow(selectedDiamond.id)}
             >
-              Add to Wishlist
+              Buy
             </button>
             <button
-              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-              onClick={() => alert("Proceeding to buy!")}
+              className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-700 min-w-32"
+              onClick={() => handleAddToWishlist(selectedDiamond.id)}
             >
-              Buy Now
+              Add to wishlist
             </button>
           </div>
         </Modal>
