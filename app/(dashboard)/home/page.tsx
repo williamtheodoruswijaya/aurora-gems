@@ -85,6 +85,7 @@ export default function Home() {
         });
       }
     } finally {
+      setDiamonds((prev) => prev.filter((diamond) => diamond.id !== id));
       handleCloseModal();
     }
   };
