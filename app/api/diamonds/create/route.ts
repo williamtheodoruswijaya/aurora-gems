@@ -14,7 +14,7 @@ const diamondSchema = z.object({
 
 export const POST = async (req: NextRequest) => {
   const session = await getServerSession(authOptions);
-  
+
   // step 0: check if user is authenticated
   if (!session) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -24,7 +24,6 @@ export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
     const { name, type, weight, price, listedById } = diamondSchema.parse(body);
-    const userId = parseInt(session.user.id,10);
 
     const newDiamond = await prisma.diamond.create({
       data: {
@@ -32,7 +31,7 @@ export const POST = async (req: NextRequest) => {
         type,
         weight,
         price,
-        listedById: userId,
+        listedById,
       },
     });
 
