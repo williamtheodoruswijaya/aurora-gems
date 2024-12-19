@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 export default function Transactions() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+
   useEffect(() => {
     const fetchTransaction = async () => {
       try {
@@ -16,7 +17,7 @@ export default function Transactions() {
       }
     };
     fetchTransaction();
-  }, []);
+  }, [transactions]);
 
   return (
     <div className="flex h-screen text-white ml-64 mt-16 w-screen">
