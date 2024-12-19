@@ -19,9 +19,9 @@ export default function Transactions() {
   }, []);
 
   return (
-    <div className="flex h-screen text-white ml-64 mt-12 w-screen">
+    <div className="flex h-screen text-white ml-64 mt-16 w-screen">
       <div className="flex-1 flex flex-col">
-        <div className="p-8 space-y-4 w-full">
+        <div className="p-6 space-y-4 overflow-y-auto w-full">
           {transactions.length === 0 && (
             <div className="text-lg font-semibold text-gray-600">
               No Transaction yet.
