@@ -14,13 +14,7 @@ import { ModeToggle } from "./ui/mode-toggle";
 
 import Gems from "@/public/assets/Gems.png";
 import Image from "next/image";
-import {
-  ChartBarIcon,
-  History,
-  Home,
-  SaveIcon,
-  Gem,
-} from "lucide-react";
+import { History, Home, SaveIcon, Gem } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
