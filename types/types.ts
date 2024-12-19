@@ -40,3 +40,10 @@ export interface Wishlist {
     diamond: Diamond;
     createdAt: string;
 }
+
+export interface Balance {
+    id: number;
+    userId: number;
+    balance: number;
+    createdAt: string;
+}
