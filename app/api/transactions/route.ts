@@ -50,12 +50,6 @@ export const GET = async () => {
                 transactionAt: true
             }
         })
-
-        // validate if transactions is empty
-        if(transactions.length === 0) {
-            return NextResponse.json({ message: "No transactions found" }, { status: 404 });
-        }
-
         return NextResponse.json({ message: "Success", data: transactions }, { status: 200 });
     }
     catch(error){

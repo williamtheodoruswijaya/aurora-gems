@@ -21,15 +21,28 @@ export const GET = async () => {
         id: true,
         userId: true,
         diamondId: true,
+        diamond: {
+          select: {
+              id: true,
+              name: true,
+              type: true,
+              weight: true,
+              price: true,
+              listedById: true,
+              listedBy: {
+                  select: {
+                      id: true,
+                      username: true,
+                      email: true,
+                      role: true
+                  }
+              },
+              createdAt: true
+          }
+      },
         createdAt: true,
       },
     });
-    if (wishlist.length === 0) {
-      return NextResponse.json(
-        { message: "No wishlist found" },
-        { status: 404 }
-      );
-    }
     return NextResponse.json(
       { message: "Success", data: wishlist },
       { status: 200 }

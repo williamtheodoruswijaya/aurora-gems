@@ -25,3 +25,18 @@ export interface Transaction {
     price: number;
     transactionAt: string;
 }
+
+export interface CardProps {
+    name: string;
+    price: string;
+    description: string;
+    onClick?: () => void;
+}
+
+export interface Wishlist {
+    id: number;
+    userId: number;
+    diamondId: number;
+    diamond: Diamond;
+    createdAt: string;
+}
