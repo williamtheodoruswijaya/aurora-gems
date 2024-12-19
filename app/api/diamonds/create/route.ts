@@ -1,4 +1,6 @@
+import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import * as z from "zod";
 
@@ -11,16 +13,26 @@ const diamondSchema = z.object({
 });
 
 export const POST = async (req: NextRequest) => {
+  const session = await getServerSession(authOptions);
+  
+  // step 0: check if user is authenticated
+  if (!session) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  // step 1: change listedById with session.user.id
   try {
     const body = await req.json();
     const { name, type, weight, price, listedById } = diamondSchema.parse(body);
+    const userId = parseInt(session.user.id,10);
+
     const newDiamond = await prisma.diamond.create({
       data: {
         name,
         type,
         weight,
         price,
-        listedById,
+        listedById: userId,
       },
     });
 
