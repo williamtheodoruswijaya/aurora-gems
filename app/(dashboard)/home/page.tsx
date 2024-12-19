@@ -27,14 +27,25 @@ export default function Home() {
         const response = await axios.get("/api/diamonds");
         setDiamonds(response.data.data);
         if (response.status === 200) {
-          console.log("Diamonds fetched successfully");
+          toast({
+            title: "Diamonds loaded successfully",
+            description: "Happy shopping!",
+            variant: "default",
+          });
+        }
+        if (response.status === 404) {
+          toast({
+            title: "No diamonds found",
+            description: "Please check back later.",
+            variant: "default",
+          });
         }
       } catch (error) {
         console.error(error);
       }
     };
     fetchDiamonds();
-  }, []);
+  }, [diamonds.length, toast]);
 
   const handleViewDetails = (diamond: Diamond) => {
     setSelectedDiamond(diamond);
@@ -49,6 +60,7 @@ export default function Home() {
   const handleBuyNow = async (id: number) => {
     try {
       const response = await axios.post(`/api/diamonds/${id}/purchase`);
+      console.log(response);
       if (response.status === 200) {
         toast({
           title: "Diamond purchased successfully",
@@ -72,6 +84,9 @@ export default function Home() {
           variant: "destructive",
         });
       }
+    } finally {
+      setDiamonds((prev) => prev.filter((diamond) => diamond.id !== id));
+      handleCloseModal();
     }
   };
 
