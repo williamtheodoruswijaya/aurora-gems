@@ -81,7 +81,14 @@ export default function Home() {
       if (response.status === 200) {
         toast({
           title: "Diamond added to wishlist",
-          description: "View your wishlist in your profile.",
+          description: "You can view your wishlist in your profile.",
+          variant: "default",
+        });
+      }
+      if (response.status === 201) {
+        toast({
+          title: "Diamond already in wishlist",
+          description: "You can view your wishlist in your profile.",
           variant: "default",
         });
       }

@@ -21,6 +21,19 @@ export async function POST(
   const userId = parseInt(session.user.id, 10);
 
   try {
+    // step 0: check if wishlist is already created
+    const existingWishlist = await prisma.wishlist.findFirst({
+      where: {
+        userId: userId,
+        diamondId: id,
+      },
+    });
+    if (existingWishlist) {
+      return NextResponse.json(
+        { wishlist: existingWishlist, message: "Wishlist already exists" },
+        { status: 201 }
+      );
+    }
     // step 1: create wishlist
     const wishlist = await prisma.wishlist.create({
       data: {
