@@ -26,20 +26,6 @@ export default function Home() {
       try {
         const response = await axios.get("/api/diamonds");
         setDiamonds(response.data.data);
-        if (response.status === 200) {
-          toast({
-            title: "Diamonds loaded successfully",
-            description: "Happy shopping!",
-            variant: "default",
-          });
-        }
-        if (response.status === 404) {
-          toast({
-            title: "No diamonds found",
-            description: "Please check back later.",
-            variant: "default",
-          });
-        }
       } catch (error) {
         console.error(error);
       }
