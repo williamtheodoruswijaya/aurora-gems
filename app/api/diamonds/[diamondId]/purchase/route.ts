@@ -100,13 +100,16 @@ export async function POST(
         where: { id: id },
         data: { listedById: userId },
       });
-      return NextResponse.json({
-        diamond: diamond,
-        message: "Diamond purchased successfully",
-      });
+      return NextResponse.json(
+        {
+          diamond: diamond,
+          message: "Diamond purchased successfully",
+        },
+        { status: 200 }
+      );
     });
 
-    return NextResponse.json(result, { status: 200 });
+    return result;
     // step 7: return diamond
   } catch (error) {
     return NextResponse.json(
