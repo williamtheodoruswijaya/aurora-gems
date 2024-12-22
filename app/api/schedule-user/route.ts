@@ -1,14 +1,10 @@
 import prisma from "@/lib/prisma";
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextResponse } from "next/server";
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
-  }
-
+export const POST = async () => {
   try {
     const randomUsername = `user_${Date.now()}`;
-    const randomEmail = `user${Date.now()}@example.com`;
+    const randomEmail = `user${Date.now()}@gmail.com`;
     const randomPassword = `password_${Math.random().toString(36).slice(-8)}`;
 
     const newUser = await prisma.user.create({
@@ -19,14 +15,24 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         role: "BUYER",
       },
     });
-
-    res
-      .status(201)
-      .json({ message: "User created successfully", user: newUser });
+    return NextResponse.json(
+      {
+        user: newUser,
+        message: "User created successfully",
+      },
+      {
+        status: 201,
+      }
+    );
   } catch (error) {
-    console.error("Error creating user:", error);
-    res.status(500).json({ message: "Error creating user", error });
+    return NextResponse.json(
+      {
+        user: null,
+        message: error,
+      },
+      {
+        status: 500,
+      }
+    );
   }
 };
-
-export default handler;
