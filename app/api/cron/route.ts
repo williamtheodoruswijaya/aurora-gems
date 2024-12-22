@@ -1,38 +1,41 @@
 import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 
-export const POST = async () => {
+export const GET = async () => {
   try {
-    const randomUsername = `user_${Date.now()}`;
-    const randomEmail = `user${Date.now()}@gmail.com`;
-    const randomPassword = `password_${Math.random().toString(36).slice(-8)}`;
-
-    const newUser = await prisma.user.create({
-      data: {
-        username: randomUsername,
-        email: randomEmail,
-        password: randomPassword,
-        role: "BUYER",
+    const diamonds = await prisma.diamond.findMany({
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        weight: true,
+        price: true,
+        listedById: true,
+        listedBy: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            role: true,
+          },
+        },
+        createdAt: true,
       },
     });
+    if (diamonds.length === 0) {
+      return NextResponse.json(
+        { messsage: "No diamonds found" },
+        { status: 404 }
+      );
+    }
     return NextResponse.json(
-      {
-        user: newUser,
-        message: "User created successfully",
-      },
-      {
-        status: 201,
-      }
+      { message: "Success", data: diamonds },
+      { status: 200 }
     );
   } catch (error) {
     return NextResponse.json(
-      {
-        user: null,
-        message: error,
-      },
-      {
-        status: 500,
-      }
+      { diamonds: null, message: "Internal server error", error },
+      { status: 500 }
     );
   }
 };
