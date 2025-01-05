@@ -29,67 +29,81 @@ export default function Account() {
   }, []);
 
   const handleTopUp = async (values: z.infer<typeof balanceSchema>) => {
-    if (isNaN(values.balance)) {
-      return toast({
-        title: "Balance must be a number",
-        variant: "destructive",
-      });
-    }
-
-    const parsedData = balanceSchema.parse({
+    const parsedData = balanceSchema.safeParse({
       balance: Number(values.balance),
     });
-    
-    if (parseInt(topUpAmount) <= 0) {
-      alert("Please enter a valid top-up amount.");
-      return;
+
+    if (!parsedData.success) {
+      return toast({
+        title: "Balance must be a valid number",
+        variant: "destructive",
+        description: parsedData.error.issues[0].message,
+      });
     }
 
     try {
       const response = await axios.post("/api/topup", {
-        balance: parsedData.balance,
+        balance: parsedData.data.balance,
       });
-
-      console.log(response);
-
+      setBalance(response.data.data);
+      toast({
+        title: "Top-up successful",
+        description: "Your balance has been updated.",
+      });
     } catch (error) {
       console.error(error);
-      alert("Failed to top up balance. Please try again.");
+      toast({
+        title: "Failed to top-up",
+        variant: "destructive",
+        description: "An unknown error occurred.",
+      });
     }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault(); // Prevent page refresh
+    if (parseInt(topUpAmount) <= 0) {
+      toast({
+        title: "Invalid amount",
+        variant: "destructive",
+        description: "Please enter a valid top-up amount greater than 0.",
+      });
+      return;
+    }
+    handleTopUp({ balance: parseInt(topUpAmount) });
   };
 
   return (
     <div className="w-screen h-screen items-center justify-center flex">
-
-      <form className="form-content mt-10 min-w-[50vh] max-w-[50vh] rounded-md items-center justify-center bg-slate-900">
+      <form
+        onSubmit={handleSubmit}
+        className="form-content mt-10 min-w-[50vh] max-w-[50vh] rounded-md items-center justify-center bg-slate-900"
+      >
         <div>
           <Image src={BackgroundGif} alt="" className="w-full rounded-t-md" />
         </div>
-        <div className="font-nunito text-xl pb-5 w-full text-center p-5 font-semibold">
+        <div className="font-nunito text-xl w-full text-center pt-5 font-semibold">
           Add Payment Method
         </div>
-        <div className="flex justify-center space-x-3">
-          <div className="justify-center w-11/12 rounded-md h-5 p-5 flex items-center bg-slate-950">Current Balance: ${balance?.balance}</div>
-        </div>
-        <div className="flex justify-center space-x-5">
-        <div className="justify-center w-11/12 rounded-md h-5 p-5 flex items-center bg-slate-950 space-x-4">
-        <div className="block font-medium text-white">Add Balance:</div>
-              <input
-                type="number"
-                name="balance"
-                value={topUpAmount}
-                onChange={(e) => setTopUpAmount(e.target.value)}
-                className="w-40 border rounded bg-white text-black"
-                required
-              />
-            </div>
-        </div>
-        <div className="flex justify-center space-x-5">
-          <div className="justify-center w-11/12 rounded-md h-5 p-5 flex items-center bg-slate-950">
-          <button className="bg-slate-800 text-white rounded-md p-1 w-80" onClick={() => handleTopUp({ balance: parseInt(topUpAmount) })}>
-            Top up
-            </button>
+        <div className="flex flex-col items-center justify-center space-y-2 p-5">
+          <div className=" flex-col justify-center w-11/12 rounded-md h-5 p-5 flex bg-slate-950">
+            Current Balance: ${balance?.balance}
           </div>
+          <input
+            type="number"
+            name="balance"
+            value={topUpAmount}
+            onChange={(e) => setTopUpAmount(e.target.value)}
+            className="flex-col justify-center w-11/12 rounded-md h-5 p-5 flex items-center bg-slate-950"
+            required
+            placeholder="Top-up Amount"
+          />
+          <button
+            type="submit" // Use "submit" to tie it to the form
+            className="flex-col justify-center w-11/12 rounded-md p-2 flex items-center bg-slate-800"
+          >
+            Top up
+          </button>
         </div>
       </form>
     </div>

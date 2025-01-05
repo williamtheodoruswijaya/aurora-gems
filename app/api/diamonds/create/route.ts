@@ -50,6 +50,17 @@ export const POST = async (req: NextRequest) => {
       });
     }
 
+    // small validation if user is trying to spam the system
+    const userDiamonds = await prisma.diamond.findMany({
+      where: { listedById },
+    });
+    if (userDiamonds.length >= 10) {
+      return NextResponse.json(
+        { message: "You can only list up to 3 diamonds", diamond: null },
+        { status: 400 }
+      );
+    }
+
     // step 2: create the diamond
     const newDiamond = await prisma.diamond.create({
       data: {
