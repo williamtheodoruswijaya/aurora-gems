@@ -34,6 +34,18 @@ export async function POST(
         { status: 201 }
       );
     }
+    // spam protection
+    const wishlistCount = await prisma.wishlist.count({
+      where: {
+        userId: userId,
+      },
+    });
+    if (wishlistCount >= 10) {
+      return NextResponse.json(
+        { wishlist: null, message: "Maximum wishlist limit reached" },
+        { status: 400 }
+      );
+    }
     // step 1: create wishlist
     const wishlist = await prisma.wishlist.create({
       data: {
