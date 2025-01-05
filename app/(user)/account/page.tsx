@@ -43,7 +43,8 @@ export default function Account() {
 
     try {
       const response = await axios.post("/api/topup", {
-        balance: parsedData.data.balance,
+        userId: balance?.userId,
+        amount: values.balance,
       });
       setBalance(response.data.data);
       toast({
